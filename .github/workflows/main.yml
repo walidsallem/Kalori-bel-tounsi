@@ -9,16 +9,29 @@ jobs:
   build-debug:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: "17"
-          cache: gradle
-      - uses: android-actions/setup-android@v3
-      - run: chmod +x ./gradlew
-      - run: ./gradlew assembleDebug --stacktrace
-      - uses: actions/upload-artifact@v4
+
+      # استعمل Gradle جاهز حتى لو ما ثماش gradlew
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v3
         with:
-          name: KaloriTounsiPlus-debug-apk
+          gradle-version: "8.7"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Build Debug APK
+        run: gradle assembleDebug --stacktrace
+
+      - name: Upload Debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: KaloriTounsi-debug-apk
           path: app/build/outputs/apk/debug/*.apk
